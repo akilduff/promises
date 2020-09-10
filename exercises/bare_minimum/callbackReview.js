@@ -23,6 +23,13 @@ var pluckFirstLineFromFile = function (filePath, callback) {
 var getStatusCode = function (url, callback) {
 // look into the request variable
 // request.response?
+  request(url, (err, response, body) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, response.statusCode);
+    }
+  });
 };
 
 // Export these functions so we can test them and reuse them in later exercises
