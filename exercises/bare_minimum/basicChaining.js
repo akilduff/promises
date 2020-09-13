@@ -13,37 +13,26 @@ var request = require('request');
 var Promise = require('bluebird');
 
 Promise.promisifyAll(fs);
-Promise.promisifyAll(request);
+
+var pluckFirstLineFromFileAsync = require('./promiseConstructor').pluckFirstLineFromFileAsync;
+var getGitHubProfileAsync = require('./promisification').getGitHubProfileAsync;
+
+
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // (1) to get Github username, invoke pluckFirstLine
-  console.log('Get Github name');
-  return fs.readFile(readFilePath)
-    .then(function(fileData) {
-      if (fileData) {
-        var dataString = fileData.toString();
-        var endOfLine = dataString.search(/$/gm);
-        var githubName = dataString.slice(0, endOfLine);
-        // console.log(githubName);
-        return githubName;
-      } else {
-        throw new Error;
-      }
-    })
-  // (2) to get profile, invoke getGitHubProfile
-    .then(function(newGithubName) {
-      var options = {
-        url: 'https://api.github.com/users/' + newGithubName,
-        headers: { 'User-Agent': 'request' },
-        json: true
-      };
-      console.log(request.get(options));
-      return request.get(options);
-    })
-  // (3) then JSON parse and invoke fs.writeFile
-    .then(function(githubProfile) {
-      return fs.writeFile(writeFilePath, githubProfile);
+
+  // (1) to get Github username, invoke pluckFirstLineFromFileAsync
+
+  // (2) to get Github profile, invoke getGitHubProfileAsync
+
+  // (3) to write to file, use fs.writeFileasync!
+
+  return pluckFirstLineFromFileAsync(readFilePath)
+    .then(getGitHubProfileAsync)
+    .then((data) => {
+      return fs.writeFileAsync(writeFilePath, JSON.stringify(data));
     });
+
 };
 
 // Export these functions so we can test them
